@@ -1,5 +1,6 @@
 module Main where
 
+import System.Environment
 import Numeric(readInt, showIntAtBase)
 import Data.Char
 import System.IO.Unsafe(unsafePerformIO)
@@ -299,16 +300,20 @@ getErrors output = do
 
 main :: IO ()
 main = do
-    file <- readFile "a.txt"
-    let fileLines = [(lineNumber, line) |
-                    linesWithNumbers <- zip [1..] $ lines file,
-                    let lineNumber = fst linesWithNumbers,
-                    let line = (snd linesWithNumbers)]
-    let linesToProcess = removeComments fileLines False 
-    let result = mapM processLine linesToProcess
-    mapM putStrLn (unsafePerformIO result)
-    let errors = map getErrors (unsafePerformIO result)
-    if length (filter (/= "") errors) == 0 then
-      putStrLn "OK"
-    else
-      putStrLn (foldl (++) "" errors)
+    args <- getArgs
+    if length args < 2 then
+      putStrLn "Error: too few arguments"
+    else do
+      file <- readFile (args !! 0)
+      let fileLines = [(lineNumber, line) |
+                      linesWithNumbers <- zip [1..] $ lines file,
+                      let lineNumber = fst linesWithNumbers,
+                      let line = (snd linesWithNumbers)]
+      let linesToProcess = removeComments fileLines False 
+      let result = mapM processLine linesToProcess
+      let errors = map getErrors (unsafePerformIO result)
+      writeFile (args !! 1) (foldr (++) "" (unsafePerformIO result))
+      if length (filter (/= "") errors) == 0 then
+        putStrLn "OK"
+      else
+        putStrLn (foldl (++) "" errors)
