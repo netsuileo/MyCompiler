@@ -1,0 +1,119 @@
+{operators}
++ ++ +++ ++++
+- -- --- ----
+* ** *** ****
+/ // /// ////
+mod mod mod
++--++-+++--++-
++-**- - ** -+
+/**/-/+/--/+/*
+
+{comparsion operators}
+>><< < > <>
+==;:=:;:=====
+<=>=:=<>=<:>=
+
+{let}
+:==:<>:==:=
+
+{comments testing}
+{dfs} {sdsd} {=} {sdwefwd}
+{dfassa
+}fds{sadas}
+{dssa
+sd
+sdas} {sad
+sda
+sasad}
+{{sdaada}
+{sdwqqwe}}
+
+{integer testing}
+2#10
+2#01
+2#128
+2#FF
+
+4#31
+4#12
+4#128
+4#FF
+
+8#71
+8#13
+8#99
+8#FF
+
+10#22
+22
+FF
+10#FF
+10#0
+
+16#FF
+16#FE
+16#DEADBEEF
+16#00
+
+{real numbers testing}
+1.0
+1.
+.11
+
+1.1234567
+12345.67
+123.
+.4567
+
+1.0e34
+1.0e+34
+1.0e-34
+.22e-22
+722.e+11
+722.11e-1
+1.0e128
+144.221e256
+
+{Id and Label testing}
+lol
+lol:
+lol::
+label lol:
+1lol:
+2lol
+#lol
+%lol
+42lo2
+lo2
+lo144
+
+{this
+is the typical
+program on leo's
+lang}
+
+var
+int cat, dogs[10], helicon, helios;
+real kitten, lizzards[10], Kinda
+
+tools
+proc meow int cat; real kitten
+begin
+  := cat, (+ cat 8#164);
+  write cat, space, (+ kitten, 2.0e38), tab, kitten
+end;
+proc psss int helicon; real lizzards[10]
+begin
+  cast helicon, lizzards[2];
+  write helicon, space, (lizzards[1]), tab, kitten
+end
+
+begin
+  := lizzards[0], 0;
+  := lizzards[1], 1;
+  := lizzards[2], 2;
+  if helicon = 0 then
+    call meow cat, kitten
+  else
+    call psss helicon, lizzards
+end
