@@ -1,7 +1,7 @@
 module Main where
 
 import System.Environment
-import Numeric(readInt, showIntAtBase)
+import Numeric(readInt, showIntAtBase, showEFloat)
 import Data.Char
 import System.IO.Unsafe(unsafePerformIO)
 import Control.Monad(foldM, filterM)
@@ -148,7 +148,8 @@ lexemsToSplit = map makeRegexForSubtitution [
                                             (":=", " := "), 
                                             (";", " ; "), 
                                             (",", " , "),
-                                            (":", " : "),
+                                            (":$", ": "),
+                                            (":([^=])", " : \\1"),
                                             ("\\[", " [ "), 
                                             ("\\]", " ] "), 
                                             ("\\(", " ( "), 
@@ -168,7 +169,7 @@ getByteList :: Either String [B.ByteString] -> [B.ByteString]
 getByteList (Right x) = x
 
 substituteLine :: B.ByteString -> (Regex, B.ByteString) -> IO B.ByteString
-substituteLine line (regex, replacement) = do 
+substituteLine line (regex, replacement) = do
     result <- substitute regex line replacement
     return $ getByte (result)
 
@@ -218,18 +219,23 @@ formatReal str = do
         str
 
 realToStdForm :: String -> String 
-realToStdForm str = show (read (formatReal str) :: Float)
+realToStdForm str = B.unpack $ unsafePerformIO $ substituteLine 
+  (B.pack (showEFloat Nothing (read (formatReal str) :: Float) ""))
+  (makeRegex "e([^\\-0])" :: Regex, B.pack "e+\\1")
 
 makeOutputForLexeme :: (Lexeme, B.ByteString) -> String
-makeOutputForLexeme (lexeme, value) = "lex:" ++ (getName lexeme) ++ "\t" ++
+makeOutputForLexeme (lexeme, value) = "lex:" ++ 
   (
     if lexeme == LexInt then 
-      "int:" ++ (intToStdForm (B.unpack value)) ++ "\t"
-    else if lexeme == LexReal then
-      "real:" ++ (realToStdForm (B.unpack value)) ++ "\t"
-    else ""
-  ) ++ 
-  "val:" ++ (B.unpack value) ++ "\n"
+      (getName LexInt) ++ "\t" ++ "int:" ++ (intToStdForm (B.unpack value))
+    else if lexeme == LexReal then do
+      let realInStdForm = realToStdForm (B.unpack value)
+      if realInStdForm == "Infinity" then
+        getName LexError
+      else
+        (getName LexReal) ++ "\t" ++ "real:" ++ realInStdForm
+    else (getName lexeme)
+  ) ++ "\t" ++ "val:" ++ (B.unpack value) ++ "\n"
 
 formOutput :: Integer -> [(Lexeme, B.ByteString)] -> String
 formOutput lineNumber identified = do
@@ -283,26 +289,20 @@ getError line = do
     let lineNum = B.unpack $ splittedLine !! 0
     let lexemeType = B.unpack $ splittedLine !! 1
     if lexemeType == "lex:Error" then
-      "Error:" ++ lineNum ++ ":" ++ "unrecognized lexeme\n"
-    else if lexemeType == "lex:Real" then do
-      let realVal = B.unpack $ splittedLine !! 2
-      if realVal == "real:Infinity" then
-        "Error:" ++ lineNum ++ ":" ++ "real value is too big\n"
-      else ""
+      "Error:" ++ lineNum ++ ":" ++ "incorrect lexeme\n"
     else ""
 
 getErrors :: String -> String
 getErrors output = do
     let lines = getByteList (unsafePerformIO (split (makeRegex "\n" :: Regex) (B.pack output)))
     let errorOutputs = map getError lines
-    foldl (++) "" (filter (/= "") errorOutputs)
-
+    foldr (++) "" (filter (/= "") errorOutputs)
 
 main :: IO ()
 main = do
     args <- getArgs
     if length args < 2 then
-      putStrLn "Error: too few arguments"
+      putStrLn "Error:Params:too few arguments"
     else do
       file <- readFile (args !! 0)
       let fileLines = [(lineNumber, line) |
@@ -316,4 +316,4 @@ main = do
       if length (filter (/= "") errors) == 0 then
         putStrLn "OK"
       else
-        putStrLn (foldl (++) "" errors)
+        putStr (foldl (++) "" errors)
