@@ -1,0 +1,317 @@
+2	lex:Add	val:+
+2	lex:Add	val:+
+2	lex:Add	val:+
+2	lex:Add	val:+
+2	lex:Add	val:+
+2	lex:Add	val:+
+2	lex:Add	val:+
+2	lex:Add	val:+
+3	lex:Min	val:-
+3	lex:Min	val:-
+3	lex:Min	val:-
+3	lex:Min	val:-
+3	lex:Min	val:-
+3	lex:Min	val:-
+3	lex:Min	val:-
+3	lex:Min	val:-
+4	lex:Mul	val:*
+4	lex:Mul	val:*
+4	lex:Mul	val:*
+4	lex:Mul	val:*
+4	lex:Mul	val:*
+4	lex:Mul	val:*
+4	lex:Mul	val:*
+4	lex:Mul	val:*
+4	lex:Mul	val:*
+4	lex:Mul	val:*
+5	lex:Div	val:/
+5	lex:Div	val:/
+5	lex:Div	val:/
+5	lex:Div	val:/
+5	lex:Div	val:/
+5	lex:Div	val:/
+5	lex:Div	val:/
+5	lex:Div	val:/
+5	lex:Div	val:/
+5	lex:Div	val:/
+6	lex:Mod	val:mod
+6	lex:Mod	val:mod
+6	lex:Mod	val:mod
+7	lex:Add	val:+
+7	lex:Min	val:-
+7	lex:Min	val:-
+7	lex:Error	val:++
+7	lex:Min	val:-
+7	lex:Add	val:+
+7	lex:Min	val:-
+7	lex:Error	val:++
+7	lex:Min	val:-
+7	lex:Min	val:-
+7	lex:Error	val:++
+7	lex:Min	val:-
+7	lex:Add	val:+
+7	lex:Min	val:-
+7	lex:Error	val:++
+7	lex:Min	val:-
+7	lex:Add	val:+
+7	lex:Min	val:-
+8	lex:Add	val:+
+8	lex:Min	val:-
+8	lex:Mul	val:*
+8	lex:Mul	val:*
+8	lex:Add	val:+
+8	lex:Min	val:-
+8	lex:Mul	val:*
+8	lex:Add	val:+
+8	lex:Min	val:-
+8	lex:Mul	val:*
+8	lex:Mul	val:*
+8	lex:Mul	val:*
+8	lex:Add	val:+
+8	lex:Min	val:-
+8	lex:Mul	val:*
+8	lex:Add	val:+
+9	lex:Div	val:/
+9	lex:Mul	val:*
+9	lex:Mul	val:*
+9	lex:Div	val:/
+9	lex:Min	val:-
+9	lex:Div	val:/
+9	lex:Div	val:/
+9	lex:Add	val:+
+9	lex:Div	val:/
+9	lex:Div	val:/
+9	lex:Min	val:-
+9	lex:Div	val:/
+9	lex:Min	val:-
+9	lex:Div	val:/
+9	lex:Add	val:+
+9	lex:Div	val:/
+9	lex:Div	val:/
+9	lex:Mul	val:*
+12	lex:GT	val:>
+12	lex:GT	val:>
+12	lex:LT	val:<
+12	lex:LT	val:<
+12	lex:NE	val:<>
+12	lex:GT	val:>
+12	lex:LT	val:<
+12	lex:NE	val:<>
+13	lex:EQ	val:=
+13	lex:EQ	val:=
+13	lex:Semicolon	val:;
+13	lex:Let	val::=
+13	lex:Colon	val::
+13	lex:Semicolon	val:;
+13	lex:Let	val::=
+13	lex:EQ	val:=
+13	lex:EQ	val:=
+13	lex:EQ	val:=
+13	lex:EQ	val:=
+14	lex:LE	val:<=
+14	lex:GE	val:>=
+14	lex:Let	val::=
+14	lex:NE	val:<>
+14	lex:EQ	val:=
+14	lex:LT	val:<
+14	lex:Colon	val::
+14	lex:GE	val:>=
+17	lex:Let	val::=
+17	lex:EQ	val:=
+17	lex:Colon	val::
+17	lex:NE	val:<>
+17	lex:Let	val::=
+17	lex:EQ	val:=
+17	lex:Let	val::=
+22	lex:Id	val:fds
+25	lex:Error	val:{sad
+26	lex:Id	val:sda
+27	lex:Error	val:sasad}
+29	lex:Error	val:}
+32	lex:Int	int:2	val:2#10
+33	lex:Int	int:1	val:2#01
+34	lex:Error	val:2#128
+35	lex:Error	val:2#FF
+37	lex:Int	int:13	val:4#31
+38	lex:Int	int:6	val:4#12
+39	lex:Error	val:4#128
+40	lex:Error	val:4#FF
+42	lex:Int	int:57	val:8#71
+43	lex:Int	int:11	val:8#13
+44	lex:Error	val:8#99
+45	lex:Error	val:8#FF
+47	lex:Int	int:22	val:10#22
+48	lex:Int	int:22	val:22
+49	lex:Id	val:FF
+50	lex:Error	val:10#FF
+51	lex:Int	int:0	val:10#0
+53	lex:Int	int:255	val:16#FF
+54	lex:Int	int:254	val:16#FE
+55	lex:Int	int:3735928559	val:16#DEADBEEF
+56	lex:Int	int:0	val:16#00
+59	lex:Real	real:1.0e0	val:1.0
+60	lex:Real	real:1.0e0	val:1.
+61	lex:Real	real:1.1e-1	val:.11
+63	lex:Real	real:1.1234567e0	val:1.1234567
+64	lex:Real	real:1.234567e+4	val:12345.67
+65	lex:Real	real:1.23e+2	val:123.
+66	lex:Real	real:4.567e-1	val:.4567
+68	lex:Real	real:1.0e+34	val:1.0e34
+69	lex:Real	real:1.0e+34	val:1.0e+34
+70	lex:Real	real:1.0e-34	val:1.0e-34
+71	lex:Real	real:2.2e-23	val:.22e-22
+72	lex:Real	real:7.22e+13	val:722.e+11
+73	lex:Real	real:7.2211e+1	val:722.11e-1
+74	lex:Error	val:1.0e128
+75	lex:Error	val:144.221e256
+78	lex:Id	val:lol
+79	lex:Id	val:lol
+79	lex:Colon	val::
+80	lex:Id	val:lol
+80	lex:Colon	val::
+80	lex:Colon	val::
+81	lex:Id	val:label
+81	lex:Id	val:lol
+81	lex:Colon	val::
+82	lex:Error	val:1lol
+82	lex:Colon	val::
+83	lex:Error	val:2lol
+84	lex:Error	val:#lol
+85	lex:Error	val:%lol
+86	lex:Error	val:42lo2
+87	lex:Id	val:lo2
+88	lex:Id	val:lo144
+95	lex:Var	val:var
+96	lex:TypeInt	val:int
+96	lex:Id	val:cat
+96	lex:Comma	val:,
+96	lex:Id	val:dogs
+96	lex:LSB	val:[
+96	lex:Int	int:10	val:10
+96	lex:RSB	val:]
+96	lex:Comma	val:,
+96	lex:Id	val:helicon
+96	lex:Comma	val:,
+96	lex:Id	val:helios
+96	lex:Semicolon	val:;
+97	lex:TypeReal	val:real
+97	lex:Id	val:kitten
+97	lex:Comma	val:,
+97	lex:Id	val:lizzards
+97	lex:LSB	val:[
+97	lex:Int	int:10	val:10
+97	lex:RSB	val:]
+97	lex:Comma	val:,
+97	lex:Id	val:Kinda
+99	lex:Tools	val:tools
+100	lex:Proc	val:proc
+100	lex:Id	val:meow
+100	lex:TypeInt	val:int
+100	lex:Id	val:cat
+100	lex:Semicolon	val:;
+100	lex:TypeReal	val:real
+100	lex:Id	val:kitten
+101	lex:Beg	val:begin
+102	lex:Let	val::=
+102	lex:Id	val:cat
+102	lex:Comma	val:,
+102	lex:LRB	val:(
+102	lex:Add	val:+
+102	lex:Id	val:cat
+102	lex:Int	int:116	val:8#164
+102	lex:RRB	val:)
+102	lex:Semicolon	val:;
+103	lex:Write	val:write
+103	lex:Id	val:cat
+103	lex:Comma	val:,
+103	lex:Space	val:space
+103	lex:Comma	val:,
+103	lex:LRB	val:(
+103	lex:Add	val:+
+103	lex:Id	val:kitten
+103	lex:Comma	val:,
+103	lex:Real	real:2.0e+38	val:2.0e38
+103	lex:RRB	val:)
+103	lex:Comma	val:,
+103	lex:Tab	val:tab
+103	lex:Comma	val:,
+103	lex:Id	val:kitten
+104	lex:End	val:end
+104	lex:Semicolon	val:;
+105	lex:Proc	val:proc
+105	lex:Id	val:psss
+105	lex:TypeInt	val:int
+105	lex:Id	val:helicon
+105	lex:Semicolon	val:;
+105	lex:TypeReal	val:real
+105	lex:Id	val:lizzards
+105	lex:LSB	val:[
+105	lex:Int	int:10	val:10
+105	lex:RSB	val:]
+106	lex:Beg	val:begin
+107	lex:Cast	val:cast
+107	lex:Id	val:helicon
+107	lex:Comma	val:,
+107	lex:Id	val:lizzards
+107	lex:LSB	val:[
+107	lex:Int	int:2	val:2
+107	lex:RSB	val:]
+107	lex:Semicolon	val:;
+108	lex:Write	val:write
+108	lex:Id	val:helicon
+108	lex:Comma	val:,
+108	lex:Space	val:space
+108	lex:Comma	val:,
+108	lex:LRB	val:(
+108	lex:Id	val:lizzards
+108	lex:LSB	val:[
+108	lex:Int	int:1	val:1
+108	lex:RSB	val:]
+108	lex:RRB	val:)
+108	lex:Comma	val:,
+108	lex:Tab	val:tab
+108	lex:Comma	val:,
+108	lex:Id	val:kitten
+109	lex:End	val:end
+111	lex:Beg	val:begin
+112	lex:Let	val::=
+112	lex:Id	val:lizzards
+112	lex:LSB	val:[
+112	lex:Int	int:0	val:0
+112	lex:RSB	val:]
+112	lex:Comma	val:,
+112	lex:Int	int:0	val:0
+112	lex:Semicolon	val:;
+113	lex:Let	val::=
+113	lex:Id	val:lizzards
+113	lex:LSB	val:[
+113	lex:Int	int:1	val:1
+113	lex:RSB	val:]
+113	lex:Comma	val:,
+113	lex:Int	int:1	val:1
+113	lex:Semicolon	val:;
+114	lex:Let	val::=
+114	lex:Id	val:lizzards
+114	lex:LSB	val:[
+114	lex:Int	int:2	val:2
+114	lex:RSB	val:]
+114	lex:Comma	val:,
+114	lex:Int	int:2	val:2
+114	lex:Semicolon	val:;
+115	lex:If	val:if
+115	lex:Id	val:helicon
+115	lex:EQ	val:=
+115	lex:Int	int:0	val:0
+115	lex:Then	val:then
+116	lex:Call	val:call
+116	lex:Id	val:meow
+116	lex:Id	val:cat
+116	lex:Comma	val:,
+116	lex:Id	val:kitten
+117	lex:Else	val:else
+118	lex:Call	val:call
+118	lex:Id	val:psss
+118	lex:Id	val:helicon
+118	lex:Comma	val:,
+118	lex:Id	val:lizzards
+119	lex:End	val:end
