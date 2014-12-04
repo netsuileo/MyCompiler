@@ -2,6 +2,9 @@ module Main where
 
 import Prelude 
 import System.Environment(getArgs)
+import Data.Char(isSpace)
+import Data.List(isInfixOf)
+import Debug.Trace(trace)
 
 data Lexeme = LexError | 
               LexAdd | LexMin| LexMul | LexDiv | LexMod |
@@ -53,8 +56,37 @@ instance Show LexemeOut where
     show LexemeOther  {lineNum = n, lexemeType = t, value = v} =
       show n ++ ":\tLex:" ++ show t ++ "\tval:" ++ v
 
-getLexemes :: String -> [LexemeOut]
-getLexemes file = do
+isSeparator :: Char -> Bool
+-- isSeparator c = isInfixOf [c] "\t\n\r\f\v +-*/()[]{}=><,;:"
+isSeparator c = isInfixOf [c] "\t\n\r\f\v"
+
+performComment :: Integer -> String -> (Integer, String)
+performComment lineNum (c:str)
+  | c == '}' = (lineNum, str)
+  | c == '\n' = performComment (lineNum + 1) str
+  | otherwise = performComment lineNum str
+
+performUnrecognizedLexeme :: Integer -> String -> String -> (LexemeOut, String)
+performUnrecognizedLexeme lineNum (c:str) lexStr
+  | str == [] = (LexemeError lineNum LexError "UnrecognizedLexeme" (c:lexStr), str)
+  | isSeparator c = (LexemeError lineNum LexError "UnrecognizedLexeme" lexStr, c:str)
+  | otherwise = performUnrecognizedLexeme lineNum str (c:lexStr)
+
+getLexemes :: Integer -> String -> [LexemeOut]
+getLexemes _ [] = []
+getLexemes lineNum (c:str) =
+    if c == '{' then do
+      let withoutComment = performComment lineNum str
+      getLexemes (fst withoutComment) (snd withoutComment)
+    else if c == ':' then
+      LexemeOther lineNum LexColon [c] : getLexemes lineNum str
+    else if c == '\n' then
+      getLexemes (lineNum + 1) str
+    else if isSpace c then
+      getLexemes lineNum str
+    else do
+      let withoutUnrecognized = performUnrecognizedLexeme lineNum (c:str) ""
+      (fst withoutUnrecognized) : getLexemes lineNum (snd withoutUnrecognized)
 
 main :: IO ()
 main = do
@@ -63,7 +95,7 @@ main = do
       putStrLn "Error:Params:too few arguments"
     else do
       file <- readFile (args !! 0)
-      let lexemes = getLexemes file
+      let lexemes = getLexemes 1 file
       let errors = filter (== LexemeError 0 LexError "" "") lexemes
       writeFile (args !! 1) (foldr (++) "" (map (++ "\n") (map show lexemes)))
       if length errors == 0 then
