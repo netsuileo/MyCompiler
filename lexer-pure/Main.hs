@@ -22,7 +22,52 @@ data Lexeme = LexError |
               LexTools | LexProc | LexCall |
               LexIf | LexThen | LexElse |
               LexWhile | LexDo
-              deriving (Show, Eq)
+              deriving (Eq)
+
+instance Show Lexeme where
+    show LexError = "Error"
+    show LexAdd = "Add"
+    show LexMin = "Min"
+    show LexMul = "Mul" 
+    show LexDiv = "Div"
+    show LexMod = "Mod"
+    show LexEQ = "EQ"
+    show LexNE = "NE"
+    show LexLT = "LT"
+    show LexGT = "GT"
+    show LexLE = "LE"
+    show LexGE = "GE"
+    show LexLet = "Let"
+    show LexCast = "Cast"
+    show LexBeg = "Beg"
+    show LexEnd = "End"
+    show LexInt = "Int"
+    show LexReal = "Real"
+    show LexId = "Id"
+    show LexLRB = "LRB"
+    show LexRRB = "RRB"
+    show LexLSB = "LSB"
+    show LexRSB = "RSB"
+    show LexComma = "Comma"
+    show LexSemicolon = "Semicolon"
+    show LexColon = "Colon"
+    show LexVar = "Var"
+    show LexTypeInt = "TypeInt"
+    show LexTypeReal = "TypeReal"
+    show LexGoto = "Goto"
+    show LexRead = "Read"
+    show LexWrite = "Write"
+    show LexSkip = "Skip"
+    show LexSpace = "Space"
+    show LexTab = "Tab"
+    show LexTools = "Tools"
+    show LexProc = "Proc"
+    show LexCall = "Call"
+    show LexIf = "If"
+    show LexThen = "Then"
+    show LexElse = "Else"
+    show LexWhile = "While"
+    show LexDo = "Do"
 
 data LexemeOut = LexemeNumber { lineNum :: Integer,
                                 lexemeType :: Lexeme,
@@ -52,12 +97,12 @@ instance ShowError LexemeOut where
 
 instance Show LexemeOut where
     show LexemeNumber {lineNum = n, lexemeType = t, interpretedValue = i, value = v} =
-      show n ++ ":\tLex:" ++ show t ++
+      show n ++ "\tLex:" ++ show t ++
       (if t == LexInt then "\tint:" else "\treal:") ++ i ++ "\tval:" ++ v
     show LexemeError  {lineNum = n, lexemeType = t, message = m, value = v} =
-      show n ++ ":\tLex:" ++ show t ++ "\tval:" ++ v
+      show n ++ "\tLex:" ++ show t ++ "\tval:" ++ v
     show LexemeOther  {lineNum = n, lexemeType = t, value = v} =
-      show n ++ ":\tLex:" ++ show t ++ "\tval:" ++ v
+      show n ++ "\tLex:" ++ show t ++ "\tval:" ++ v
 
 isSeparator :: Char -> Bool
 isSeparator c = isSpace c || c `elem` "+-*/()[]{}=><,;:"
