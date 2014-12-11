@@ -2,8 +2,10 @@ module Main where
 
 import Prelude 
 import System.Environment(getArgs)
-import Data.Char(isSpace)
-import Data.List(isInfixOf)
+import Numeric(readInt, showIntAtBase, showEFloat) 
+import Data.Char(isSpace, isDigit, isAlpha, isAlphaNum, digitToInt, intToDigit)
+import Data.List(elem, last, isInfixOf)
+import Data.List.Split(splitOn, splitOneOf)
 import Debug.Trace(trace)
 
 data Lexeme = LexError | 
@@ -50,42 +52,212 @@ instance ShowError LexemeOut where
 
 instance Show LexemeOut where
     show LexemeNumber {lineNum = n, lexemeType = t, interpretedValue = i, value = v} =
-      show n ++ ":\tLex:" ++ show t ++ "\tval:" ++ v
+      show n ++ ":\tLex:" ++ show t ++
+      (if t == LexInt then "\tint:" else "\treal:") ++ i ++ "\tval:" ++ v
     show LexemeError  {lineNum = n, lexemeType = t, message = m, value = v} =
       show n ++ ":\tLex:" ++ show t ++ "\tval:" ++ v
     show LexemeOther  {lineNum = n, lexemeType = t, value = v} =
       show n ++ ":\tLex:" ++ show t ++ "\tval:" ++ v
 
 isSeparator :: Char -> Bool
--- isSeparator c = isInfixOf [c] "\t\n\r\f\v +-*/()[]{}=><,;:"
-isSeparator c = isInfixOf [c] "\t\n\r\f\v"
+isSeparator c = isSpace c || c `elem` "+-*/()[]{}=><,;:"
 
-performComment :: Integer -> String -> (Integer, String)
-performComment lineNum (c:str)
+removeComment :: Integer -> String -> (Integer, String)
+removeComment lineNum (c:str)
   | c == '}' = (lineNum, str)
-  | c == '\n' = performComment (lineNum + 1) str
-  | otherwise = performComment lineNum str
+  | c == '\n' = removeComment (lineNum + 1) str
+  | otherwise = removeComment lineNum str
 
-performUnrecognizedLexeme :: Integer -> String -> String -> (LexemeOut, String)
-performUnrecognizedLexeme lineNum (c:str) lexStr
-  | str == [] = (LexemeError lineNum LexError "UnrecognizedLexeme" (c:lexStr), str)
-  | isSeparator c = (LexemeError lineNum LexError "UnrecognizedLexeme" lexStr, c:str)
-  | otherwise = performUnrecognizedLexeme lineNum str (c:lexStr)
+makeUnrecognizedLexeme :: Integer -> String -> String -> (LexemeOut, String)
+makeUnrecognizedLexeme lineNum (c:str) lexStr
+  | lexStr == "" = makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
+  | isSeparator c = (LexemeError lineNum LexError "Unrecognized lexeme" lexStr, c:str)
+  | str == [] = (LexemeError lineNum LexError "Unrecognized lexeme" (lexStr ++ [c]), str)
+  | otherwise = makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
+
+isOneSymbolLexeme :: Char -> Bool
+isOneSymbolLexeme c = c `elem` "+-*/()[]=><,;:"
+
+getOneSymbolLexemeType :: Char -> Lexeme
+getOneSymbolLexemeType c
+  | c == '+' = LexAdd
+  | c == '-' = LexMin
+  | c == '*' = LexMul
+  | c == '/' = LexDiv
+  | c == '(' = LexRRB
+  | c == ')' = LexLRB
+  | c == '[' = LexRSB
+  | c == ']' = LexLSB
+  | c == '=' = LexEQ
+  | c == '>' = LexGT
+  | c == '<' = LexLT
+  | c == ',' = LexComma
+  | c == ';' = LexSemicolon
+  | c == ':' = LexColon
+  | otherwise = error ("No lexeme type for " ++ [c] ++ " symbol")
+
+makeOneSymbolLexeme :: Integer -> Char -> LexemeOut
+makeOneSymbolLexeme lineNum c = 
+    LexemeOther lineNum (getOneSymbolLexemeType c) [c]
+
+getTwoSymbolLexemeType :: Char -> Char -> Lexeme
+getTwoSymbolLexemeType c1 c2 
+  | c1 == '>' && c2 == '=' = LexGE
+  | c1 == '<' && c2 == '=' = LexLE
+  | c1 == '<' && c2 == '>' = LexNE
+  | c1 == ':' && c2 == '=' = LexLet
+  | otherwise = error ("No lexeme type for" ++ [c1, c2] ++ " symbol")
+
+isTwoSymbolLexeme :: Char -> Char -> Bool
+isTwoSymbolLexeme c1 c2 =
+    (c1 == '>' && c2 == '=') ||
+    (c1 == '<' && (c2 == '=' || c2 == '>')) ||
+    (c1 == ':' && c2 == '=')
+
+makeTwoSymbolLexeme :: Integer -> Char -> Char -> LexemeOut
+makeTwoSymbolLexeme lineNum c1 c2 = 
+    LexemeOther lineNum (getTwoSymbolLexemeType c1 c2) [c1, c2]
+
+getKeywordOrIdLexemeType :: String -> Lexeme
+getKeywordOrIdLexemeType str
+  | str == "mod" = LexMod
+  | str == "cast" = LexCast
+  | str == "begin" = LexBeg
+  | str == "end" = LexEnd
+  | str == "var" = LexVar
+  | str == "int" = LexTypeInt
+  | str == "real" = LexTypeReal
+  | str == "goto" = LexGoto
+  | str == "read" = LexRead
+  | str == "write" = LexWrite
+  | str == "skip" = LexSkip
+  | str == "space" = LexSpace
+  | str == "tab" = LexTab
+  | str == "tools" = LexTools
+  | str == "proc" = LexProc
+  | str == "call" = LexCall
+  | str == "if" = LexIf
+  | str == "then" = LexThen
+  | str == "else" = LexElse
+  | str == "while" = LexWhile
+  | str == "do" = LexDo
+  | otherwise = LexId
+
+makeKeywordOrIdLexeme :: Integer -> String -> String -> (LexemeOut, String)
+makeKeywordOrIdLexeme lineNum (c:str) lexStr 
+  | lexStr == "" = makeKeywordOrIdLexeme lineNum str (lexStr ++ [c])
+  | str == [] && isAlphaNum c = (LexemeOther lineNum (getKeywordOrIdLexemeType (lexStr ++ [c])) (lexStr ++ [c]), str)
+  | isAlphaNum c = makeKeywordOrIdLexeme lineNum str (lexStr ++ [c])
+  | isSeparator c = (LexemeOther lineNum (getKeywordOrIdLexemeType lexStr) lexStr, c:str)
+  | otherwise = makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
+
+fromBase :: Int -> String -> Int
+fromBase base = fst . head . readInt base ((<base).digitToInt) digitToInt
+
+parseInteger :: Integer -> String -> LexemeOut
+parseInteger lineNum lexStr = do
+    let baseAndNum = splitOn "#" lexStr
+    if length baseAndNum == 2 then do
+      let baseStr = baseAndNum !! 0
+      let numStr = baseAndNum !! 1
+      if baseStr `elem` ["2", "4", "8", "10", "16"] then do
+        let base = read baseStr :: Int
+        if foldr (&&) True (map ((<base).digitToInt) numStr) then
+          LexemeNumber lineNum LexInt (show $ fromBase base numStr) lexStr
+        else
+          LexemeError lineNum LexError "Wrong number in current base" lexStr
+      else
+        LexemeError lineNum LexError "Wrong base number" lexStr
+    else if length baseAndNum == 1 then do
+      let numStr = baseAndNum !! 0
+      let num = read numStr :: Int
+      LexemeNumber lineNum LexInt (show num) lexStr
+    else
+      LexemeError lineNum LexError "Unrecognized lexeme" lexStr
+
+formatReal :: String -> String
+formatReal str = do
+    let splittedReal = splitOn "." str
+    if head str == '.' then
+      "0" ++ str
+    else if last str == '.' then
+      str ++ "0"
+    else if length splittedReal == 2 && head (splittedReal !! 1) `elem` "eE" then do
+      (splittedReal !! 0) ++ ".0" ++ (splittedReal !! 1)
+    else
+      str
+
+parseFloat :: Integer -> String -> LexemeOut
+parseFloat lineNum lexStr = do
+    let formatted = formatReal lexStr
+    let float = read formatted :: Float
+    if (show float) `elem` ["Infinity", "-Infinity"] then
+      LexemeError lineNum LexError "Float value is too big" lexStr
+    else do
+      let floatRepr = showEFloat Nothing float ""
+      if not $ "e-" `isInfixOf` floatRepr then do
+        let splittedFloat = splitOn "e" floatRepr
+        LexemeNumber lineNum LexReal (splittedFloat !! 0 ++ "e+" ++ splittedFloat !! 1) lexStr
+      else
+        LexemeNumber lineNum LexReal floatRepr lexStr
+
+makeFloatLexeme :: Integer -> String -> String -> (LexemeOut, String)
+makeFloatLexeme lineNum (c:str) lexStr
+  | c `elem` ".e" = if c `elem` lexStr then
+                      makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
+                    else
+                      makeFloatLexeme lineNum str (lexStr ++ [c])
+  | c `elem` "+-" = if '+' `elem` lexStr || '-' `elem` lexStr then
+                      makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
+                    else if last lexStr == 'e' then
+                      makeFloatLexeme lineNum str (lexStr ++ [c]) 
+                    else
+                      makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
+  | isDigit c = makeFloatLexeme lineNum str (lexStr ++ [c]) 
+  | isSeparator c = (parseFloat lineNum lexStr, c:str)
+  | otherwise = makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
+
+makeIntegerLexeme :: Integer -> String -> String -> (LexemeOut, String)
+makeIntegerLexeme lineNum (c:str) lexStr
+  | c == '#' = if c `elem` lexStr then
+                 makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
+               else
+                 makeIntegerLexeme lineNum str (lexStr ++ [c])
+  | c `elem` "1234567890aAbBcCdDeEfF" = makeIntegerLexeme lineNum str (lexStr ++ [c])
+  | isSeparator c = (parseInteger lineNum lexStr, c:str)
+  | otherwise = makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
+
+makeNumberLexeme :: Integer -> String -> String -> (LexemeOut, String)
+makeNumberLexeme lineNum (c:str) lexStr
+  | isDigit c = makeNumberLexeme lineNum str (lexStr ++ [c]) 
+  | c == '.' || c == 'e' = makeFloatLexeme lineNum str (lexStr ++ [c])
+  | c == '#' = makeIntegerLexeme lineNum str (lexStr ++ [c])
+  | str == [] = (parseInteger lineNum lexStr, c:str)
+  | isSeparator c = (parseInteger lineNum lexStr, c:str)
+  | otherwise = makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
 
 getLexemes :: Integer -> String -> [LexemeOut]
 getLexemes _ [] = []
 getLexemes lineNum (c:str) =
     if c == '{' then do
-      let withoutComment = performComment lineNum str
+      let withoutComment = removeComment lineNum str
       getLexemes (fst withoutComment) (snd withoutComment)
-    else if c == ':' then
-      LexemeOther lineNum LexColon [c] : getLexemes lineNum str
+    else if str /= [] && isTwoSymbolLexeme c (head str) then
+      makeTwoSymbolLexeme lineNum c (head str) : getLexemes lineNum (tail str)
+    else if isOneSymbolLexeme c then
+      makeOneSymbolLexeme lineNum c : getLexemes lineNum str
+    else if isDigit c || c == '.' then do
+      let lexemeAndStrTail = makeNumberLexeme lineNum (c:str) ""
+      (fst lexemeAndStrTail) : getLexemes lineNum (snd lexemeAndStrTail)
+    else if isAlpha c then do
+      let lexemeAndStrTail = makeKeywordOrIdLexeme lineNum (c:str) ""
+      (fst lexemeAndStrTail) : getLexemes lineNum (snd lexemeAndStrTail)
     else if c == '\n' then
       getLexemes (lineNum + 1) str
     else if isSpace c then
       getLexemes lineNum str
     else do
-      let withoutUnrecognized = performUnrecognizedLexeme lineNum (c:str) ""
+      let withoutUnrecognized = makeUnrecognizedLexeme lineNum (c:str) ""
       (fst withoutUnrecognized) : getLexemes lineNum (snd withoutUnrecognized)
 
 main :: IO ()
@@ -93,6 +265,8 @@ main = do
     args <- getArgs
     if length args < 2 then
       putStrLn "Error:Params:too few arguments"
+    else if length args > 2 then
+      putStrLn "Error:Params:too many arguments"
     else do
       file <- readFile (args !! 0)
       let lexemes = getLexemes 1 file
