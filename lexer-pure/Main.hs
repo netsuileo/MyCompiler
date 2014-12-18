@@ -203,16 +203,19 @@ parseInteger :: Integer -> String -> LexemeOut
 parseInteger lineNum lexStr = do
     let baseAndNum = splitOn "#" lexStr
     if length baseAndNum == 2 then do
-      let baseStr = baseAndNum !! 0
-      let numStr = baseAndNum !! 1
-      if baseStr `elem` ["2", "4", "8", "10", "16"] then do
-        let base = read baseStr :: Int
-        if foldr (&&) True (map ((<base).digitToInt) numStr) then
-          LexemeNumber lineNum LexInt (show $ fromBase base numStr) lexStr
+      if baseAndNum !! 1 == [] then
+        LexemeError lineNum LexError "Number lexeme is unfinished" lexStr
+      else do
+        let baseStr = baseAndNum !! 0
+        let numStr = baseAndNum !! 1
+        if baseStr `elem` ["2", "4", "8", "10", "16"] then do
+          let base = read baseStr :: Int
+          if foldr (&&) True (map ((<base).digitToInt) numStr) then
+            LexemeNumber lineNum LexInt (show $ fromBase base numStr) lexStr
+          else
+            LexemeError lineNum LexError "Wrong number in current base" lexStr
         else
-          LexemeError lineNum LexError "Wrong number in current base" lexStr
-      else
-        LexemeError lineNum LexError "Wrong base number" lexStr
+          LexemeError lineNum LexError "Wrong base number" lexStr
     else if length baseAndNum == 1 then do
       let numStr = baseAndNum !! 0
       let num = read numStr :: Int
@@ -227,7 +230,7 @@ formatReal str = do
       "0" ++ str
     else if last str == '.' then
       str ++ "0"
-    else if length splittedReal == 2 && head (splittedReal !! 1) `elem` "eE" then do
+    else if length splittedReal == 2 && (head (splittedReal !! 1)) `elem` "eE" then do
       (splittedReal !! 0) ++ ".0" ++ (splittedReal !! 1)
     else
       str
@@ -241,20 +244,20 @@ parseFloat lineNum lexStr = do
     else do
       let floatRepr = showEFloat Nothing float ""
       if not $ "e-" `isInfixOf` floatRepr then do
-        let splittedFloat = splitOn "e" floatRepr
+        let splittedFloat = splitOneOf "e" floatRepr
         LexemeNumber lineNum LexReal (splittedFloat !! 0 ++ "e+" ++ splittedFloat !! 1) lexStr
       else
         LexemeNumber lineNum LexReal floatRepr lexStr
 
 makeFloatLexeme :: Integer -> String -> String -> (LexemeOut, String)
 makeFloatLexeme lineNum (c:str) lexStr
-  | c `elem` ".e" = if c `elem` lexStr then
+  | c `elem` ".eE" = if c `elem` lexStr then
                       makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
                     else
                       makeFloatLexeme lineNum str (lexStr ++ [c])
   | c `elem` "+-" = if '+' `elem` lexStr || '-' `elem` lexStr then
                       makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
-                    else if last lexStr == 'e' then
+                    else if (last lexStr) `elem` "eE" then
                       makeFloatLexeme lineNum str (lexStr ++ [c]) 
                     else
                       makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
@@ -275,7 +278,7 @@ makeIntegerLexeme lineNum (c:str) lexStr
 makeNumberLexeme :: Integer -> String -> String -> (LexemeOut, String)
 makeNumberLexeme lineNum (c:str) lexStr
   | isDigit c = makeNumberLexeme lineNum str (lexStr ++ [c]) 
-  | c == '.' || c == 'e' = makeFloatLexeme lineNum str (lexStr ++ [c])
+  | c == '.' || c `elem` "eE" = makeFloatLexeme lineNum str (lexStr ++ [c])
   | c == '#' = makeIntegerLexeme lineNum str (lexStr ++ [c])
   | str == [] = (parseInteger lineNum lexStr, c:str)
   | isSeparator c = (parseInteger lineNum lexStr, c:str)
@@ -310,8 +313,6 @@ main = do
     args <- getArgs
     if length args < 2 then
       putStrLn "Error:Params:too few arguments"
-    else if length args > 2 then
-      putStrLn "Error:Params:too many arguments"
     else do
       file <- readFile (args !! 0)
       let lexemes = getLexemes 1 file
