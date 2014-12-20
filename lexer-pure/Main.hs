@@ -3,10 +3,13 @@ module Main where
 import Prelude 
 import System.Environment(getArgs)
 import Numeric(readInt, showIntAtBase, showEFloat) 
-import Data.Char(isSpace, isDigit, isAlpha, isAlphaNum, digitToInt, intToDigit)
+import Data.Char(isSpace, isDigit, isAlpha, isAlphaNum, digitToInt, intToDigit, toLower)
 import Data.List(elem, last, isInfixOf)
 import Data.List.Split(splitOn, splitOneOf)
 import Debug.Trace(trace)
+
+stringToLower :: String -> String
+stringToLower str = map toLower str
 
 data Lexeme = LexError | 
               LexAdd | LexMin| LexMul | LexDiv | LexMod |
@@ -165,28 +168,29 @@ makeTwoSymbolLexeme lineNum c1 c2 =
 
 getKeywordOrIdLexemeType :: String -> Lexeme
 getKeywordOrIdLexemeType str
-  | str == "mod" = LexMod
-  | str == "cast" = LexCast
-  | str == "begin" = LexBeg
-  | str == "end" = LexEnd
-  | str == "var" = LexVar
-  | str == "int" = LexTypeInt
-  | str == "real" = LexTypeReal
-  | str == "goto" = LexGoto
-  | str == "read" = LexRead
-  | str == "write" = LexWrite
-  | str == "skip" = LexSkip
-  | str == "space" = LexSpace
-  | str == "tab" = LexTab
-  | str == "tools" = LexTools
-  | str == "proc" = LexProc
-  | str == "call" = LexCall
-  | str == "if" = LexIf
-  | str == "then" = LexThen
-  | str == "else" = LexElse
-  | str == "while" = LexWhile
-  | str == "do" = LexDo
+  | lowerstr == "mod" = LexMod
+  | lowerstr == "cast" = LexCast
+  | lowerstr == "begin" = LexBeg
+  | lowerstr == "end" = LexEnd
+  | lowerstr == "var" = LexVar
+  | lowerstr == "int" = LexTypeInt
+  | lowerstr == "real" = LexTypeReal
+  | lowerstr == "goto" = LexGoto
+  | lowerstr == "read" = LexRead
+  | lowerstr == "write" = LexWrite
+  | lowerstr == "skip" = LexSkip
+  | lowerstr == "space" = LexSpace
+  | lowerstr == "tab" = LexTab
+  | lowerstr == "tools" = LexTools
+  | lowerstr == "proc" = LexProc
+  | lowerstr == "call" = LexCall
+  | lowerstr == "if" = LexIf
+  | lowerstr == "then" = LexThen
+  | lowerstr == "else" = LexElse
+  | lowerstr == "while" = LexWhile
+  | lowerstr == "do" = LexDo
   | otherwise = LexId
+  where lowerstr = stringToLower str
 
 makeKeywordOrIdLexeme :: Integer -> String -> String -> (LexemeOut, String)
 makeKeywordOrIdLexeme lineNum (c:str) lexStr 
