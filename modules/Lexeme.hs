@@ -13,7 +13,7 @@ data Lexeme = LexError |
               LexRead | LexWrite | LexSkip | LexSpace | LexTab |
               LexTools | LexProc | LexCall |
               LexIf | LexThen | LexElse |
-              LexWhile | LexDo
+              LexWhile | LexDo | LexBreak
               deriving (Eq)
 
 instance Show Lexeme where
@@ -60,3 +60,4 @@ instance Show Lexeme where
     show LexElse = "Else"
     show LexWhile = "While"
     show LexDo = "Do"
+    show LexBreak = "Break"

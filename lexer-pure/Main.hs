@@ -129,6 +129,7 @@ getKeywordOrIdLexemeType str
   | lowerstr == "else" = LexElse
   | lowerstr == "while" = LexWhile
   | lowerstr == "do" = LexDo
+  | lowerstr == "break" = LexBreak
   | otherwise = LexId
   where lowerstr = stringToLower str
 
@@ -195,11 +196,11 @@ parseFloat lineNum lexStr = do
 
 makeFloatLexeme :: Integer -> String -> String -> (LexemeOut, String)
 makeFloatLexeme lineNum (c:str) lexStr
-  | c `elem` ".eE" = if c `elem` lexStr then
+  | lowerC `elem` ".e" = if lowerC `elem` lexStr then
                       makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
                     else
                       makeFloatLexeme lineNum str (lexStr ++ [c])
-  | c `elem` "+-" = if '+' `elem` lexStr || '-' `elem` lexStr then
+  | lowerC `elem` "+-" = if '+' `elem` lexStr || '-' `elem` lexStr then
                       makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
                     else if (last lexStr) `elem` "eE" then
                       makeFloatLexeme lineNum str (lexStr ++ [c]) 
@@ -208,6 +209,7 @@ makeFloatLexeme lineNum (c:str) lexStr
   | isDigit c = makeFloatLexeme lineNum str (lexStr ++ [c]) 
   | isSeparator c = (parseFloat lineNum lexStr, c:str)
   | otherwise = makeUnrecognizedLexeme lineNum str (lexStr ++ [c])
+  where lowerC = toLower c
 
 makeIntegerLexeme :: Integer -> String -> String -> (LexemeOut, String)
 makeIntegerLexeme lineNum (c:str) lexStr
