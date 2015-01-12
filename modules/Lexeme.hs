@@ -1,4 +1,5 @@
 module Lexeme where
+import Data.Char(toLower)
 
 data Lexeme = LexError | 
               LexAdd | LexMin| LexMul | LexDiv | LexMod |
@@ -61,3 +62,52 @@ instance Show Lexeme where
     show LexWhile = "While"
     show LexDo = "Do"
     show LexBreak = "Break"
+
+getLexemeByName :: String -> Lexeme
+getLexemeByName str = do
+    let lowercaseStr = map toLower str
+    case lowercaseStr of
+      "error" -> LexError 
+      "add" -> LexAdd
+      "min" -> LexMin
+      "mul" -> LexMul 
+      "div" -> LexDiv
+      "mod" -> LexMod
+      "eq" -> LexEQ
+      "ne" -> LexNE
+      "lt" -> LexLT
+      "gt" -> LexGT
+      "le" -> LexLE
+      "ge" -> LexGE
+      "let" -> LexLet
+      "cast" -> LexCast
+      "beg" -> LexBeg
+      "end" -> LexEnd
+      "int" -> LexInt
+      "real" -> LexReal
+      "id" -> LexId
+      "lrb" -> LexLRB
+      "rrb" -> LexRRB
+      "lsb" -> LexLSB
+      "rsb" -> LexRSB
+      "comma" -> LexComma
+      "semicolon" -> LexSemicolon
+      "colon" -> LexColon
+      "var" -> LexVar
+      "typeint" -> LexTypeInt
+      "typereal" -> LexTypeReal
+      "goto" -> LexGoto
+      "read" -> LexRead
+      "write" -> LexWrite
+      "skip" -> LexSkip
+      "space" -> LexSpace
+      "tab" -> LexTab
+      "tools" -> LexTools
+      "proc" -> LexProc
+      "call" -> LexCall
+      "if" -> LexIf
+      "then" -> LexThen
+      "else" -> LexElse
+      "while" -> LexWhile
+      "do" -> LexDo
+      "break" -> LexBreak

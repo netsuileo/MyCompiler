@@ -9,6 +9,6 @@ main = do
       putStrLn "Error:Params:too few arguments"
     else do
       file <- readFile (args !! 0)
-      let output = parse file
+      let output = runParse file
       writeFile (args !! 1) output
       putStrLn "OK"

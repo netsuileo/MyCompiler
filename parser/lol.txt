@@ -1,0 +1,9 @@
+1	Lex:Var	val:lol
+1	Lex:TypeInt	val:int
+1	Lex:Id	val:lol
+1	Lex:Comma	val:,
+1	Lex:Id	val:lo2l
+1	Lex:Int	int:12  val:12
+1	Lex:Semicolon	val:;
+1	Lex:TypeReal	val:real
+1	Lex:Id	val:ll
